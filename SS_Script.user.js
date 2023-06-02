@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SS_Script
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.1.0
 // @description  Adds a break and hyperlink to the SS video description
 // @match        https://ship15.shipstation.com/*
 // @grant        none
@@ -53,5 +53,5 @@
     }
 
     // Run the modifyAllElements function every second
-    setInterval(modifyAllElements, 500);
+    setInterval(modifyAllElements, 100);
 })();
