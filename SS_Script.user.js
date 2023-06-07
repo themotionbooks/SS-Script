@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         SS_Script_dev
+// @name         SS_Script
 // @namespace    http://tampermonkey.net/
 // @version      1.1.1
 // @description  Adds a break and hyperlink to the SS video description
