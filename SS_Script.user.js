@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SS_Script_dev
 // @namespace    http://tampermonkey.net/
-// @version      1.1.0
+// @version      1.1.1
 // @description  Adds a break and hyperlink to the SS video description
 // @match        https://ship15.shipstation.com/*
 // @grant        none
