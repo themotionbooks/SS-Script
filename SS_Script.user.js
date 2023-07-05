@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SS_Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.2
+// @version      1.1.3
 // @description  Adds a break and hyperlink to the SS video description
 // @match        https://ship15.shipstation.com/*
 // @grant        none
@@ -73,7 +73,7 @@
     // Function to modify all "Preload your Video" elements
     function checkElements() {
         // Find all elements with the "Preload your Video" text
-        var elements = Array.from(document.querySelectorAll('.description-UQyKl6Q > b')).filter(el => el.textContent.toLowerCase().includes('your video:')).map(el => el.parentNode);
+        var elements = Array.from(document.querySelectorAll('[class^="description-"] > b')).filter(el => el.textContent.toLowerCase().includes('your video:')).map(el => el.parentNode);
 
         // Modify each element if not already modified
         elements.forEach(element => {
