@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SS_Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.3
+// @version      1.1.4
 // @description  Adds a break and hyperlink to the SS video description
 // @match        https://ship15.shipstation.com/*
 // @grant        none
@@ -17,80 +17,97 @@
         // Get the text content of the element
         var text = element.textContent;
 
+        if (text.includes("http") || text.includes("www")) {
 
-        // Find the index of the first colon and split the text
-        var colonIndex = text.indexOf(':');
-        var firstPartText = text.slice(0, colonIndex + 1);
-        var urlText = text.slice(colonIndex + 1).trim();
-        console.log(urlText);
 
-        // Create a new bold element with the first part and a break element
-        var firstPart = document.createElement('b');
-        firstPart.textContent = firstPartText;
-        var br = document.createElement('br');
+            // Find the index of the first colon and split the text
+            var colonIndex = text.indexOf(':');
+            var firstPartText = text.slice(0, colonIndex + 1);
+            var urlText = text.slice(colonIndex + 1).trim();
+            console.log(urlText);
 
-        // Create a new hyperlink element with the Vimeo URL
-        var link = document.createElement('a');
-        link.href = urlText;
-        link.textContent = urlText;
+            // Create a new bold element with the first part and a break element
+            var firstPart = document.createElement('b');
+            firstPart.textContent = firstPartText;
+            var br = document.createElement('br');
 
-        // Remove the original text content
-        element.textContent = '';
+            // Create a new hyperlink element with the Vimeo URL
+            var link = document.createElement('a');
+            link.href = urlText;
+            link.textContent = urlText;
 
-        // Append the new text and elements to the element
-        element.appendChild(firstPart);
-        element.appendChild(br);
-        element.appendChild(link);
+            // Remove the original text content
+            element.textContent = '';
+
+            // Append the new text and elements to the element
+            element.appendChild(firstPart);
+            element.appendChild(br);
+            element.appendChild(link);
+        }
     }
 
     function modifyOrderNumber(orderNumberElement) {
-        // Get the order number text
-        var orderNumberText = orderNumberElement.textContent;
-        // Extract the last number from the order number text
-        var orderNumber = orderNumberText.match(/\d+$/)[0];
-        console.log(orderNumber)
+        var orderNumber = orderNumberElement.textContent.match(/\d+$/)[0];
+        var website = 'https://themotionbooks.com/wp-admin/post.php?post='+orderNumber+'&action=edit'// replace with your desired URL
 
-        // Get the image element
-        var imageElement = document.querySelector('.store-logo-2B7Xj-2 img');
+        // Find the existing purple button
+        var existingPurpleButton = document.querySelector('.purple-button-link');
 
-        // Create a new anchor tag
-        var linkElement = document.createElement('a');
+        if (existingPurpleButton) {
+            // If the button already exists, replace its href attribute
+            existingPurpleButton.href = website; // Replace with your desired link
+        } else {
+            // If the button doesn't exist, create it
+            var purpleButton = document.createElement('a');
+            purpleButton.href = website; // Replace with your desired link
+            purpleButton.target = '_blank'; // Open the link in a new tab
+            purpleButton.style.backgroundColor = "#865482";
+            purpleButton.style.color = 'white';
+            purpleButton.style.padding = '6px 8px';
+            purpleButton.style.marginLeft = '10px'; // Adjust the margin as needed
+            purpleButton.textContent = 'Open in Woo';
+            purpleButton.style.fontSize = '12px'; // Set the font size (adjust as needed)
+            purpleButton.style.textDecoration = 'none'; // Remove text underline on hover
+            purpleButton.style.display = 'flex'; // Use flexbox
+            purpleButton.style.alignItems = 'center'; // Center vertically
+            purpleButton.style.borderRadius = '4px'; // Round the corners
+            purpleButton.classList.add('purple-button-link'); // Add a class for easy identification
+            purpleButton.style.height = '24px'; // Set the height to make it shorter
 
-        // Set the href attribute to your desired URL
-        linkElement.href = 'https://themotionbooks.com/wp-admin/post.php?post='+orderNumber+'&action=edit'// replace with your desired URL
-
-        // Get the parent element of the image
-        var parentElement = imageElement.parentNode;
-        parentElement.style.display = 'block';
-
-        // Insert the anchor tag before the image
-        parentElement.insertBefore(linkElement, imageElement);
-
-        // Move the image inside the anchor tag
-        linkElement.appendChild(imageElement);
+            // Insert the button after the order number
+            orderNumberElement.parentNode.insertBefore(purpleButton, orderNumberElement.nextSibling);
+        }
     }
 
     // Function to modify all "Preload your Video" elements
     function checkElements() {
         // Find all elements with the "Preload your Video" text
-        var elements = Array.from(document.querySelectorAll('[class^="description-"] > b')).filter(el => el.textContent.toLowerCase().includes('your video:')).map(el => el.parentNode);
+        var videoElements = Array.from(document.querySelectorAll('[class^="description-"] > b')).filter(el => el.textContent.toLowerCase().includes('your video:')).map(el => el.parentNode);
 
         // Modify each element if not already modified
-        elements.forEach(element => {
+        videoElements.forEach(element => {
             if (!element.querySelector('a')) {
                 modifyVideo(element);
             }
         });
 
-        // Find the order number element
-        var orderNumberElement = document.querySelector('.order-number-3qZxPCk');
+        // Find the order number element// Use a CSS attribute selector to find elements with partial class names
+        var orderElements = document.querySelectorAll('[class*="order-number-and-status"]');
 
-        // Check if the order number element exists
-        if (orderNumberElement && orderNumberElement.textContent !== previous_order) {
-            console.log("changed");
-            modifyOrderNumber(orderNumberElement)
-            previous_order = orderNumberElement.textContent;
+        // Check if there are any matching elements
+        if (orderElements.length > 0) {
+            // Get the first element
+            var orderElement = orderElements[0].querySelectorAll('[class*="order-number"]')[0];
+            if (orderElement){
+                var orderNumber = orderNumber = orderElement.textContent.match(/\d+$/)[0];;
+                if (orderNumber != previous_order) {
+                    console.log("Order Changed to #" + orderNumber);
+                    modifyOrderNumber(orderElement);
+                    previous_order = orderNumber;
+                }
+            }
         }
+
     }
 
     // Run the modifyAllElements function every second
