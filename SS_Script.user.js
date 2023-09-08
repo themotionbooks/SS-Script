@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SS_Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.4
+// @version      1.1.5
 // @description  Adds a break and hyperlink to the SS video description
 // @match        https://ship15.shipstation.com/*
 // @grant        none
@@ -61,7 +61,7 @@
             var purpleButton = document.createElement('a');
             purpleButton.href = website; // Replace with your desired link
             purpleButton.target = '_blank'; // Open the link in a new tab
-            purpleButton.style.backgroundColor = "#865482";
+            purpleButton.style.backgroundColor = "#9B5C8F";
             purpleButton.style.color = 'white';
             purpleButton.style.padding = '6px 8px';
             purpleButton.style.marginLeft = '10px'; // Adjust the margin as needed
