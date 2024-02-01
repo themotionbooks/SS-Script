@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SS_Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.6
+// @version      1.1.7
 // @description  Adds a break and hyperlink to the SS video description
 // @match        https://ship15.shipstation.com/*
 // @grant        none
@@ -13,7 +13,7 @@
     var previous_order = null;
 
     // Function to modify the "Preload your Video" element
-    function modifyVideo(element) {
+    function modifyVideo(element, newLine = true) {
         // Get the text content of the element
         var text = element.textContent;
 
@@ -29,11 +29,13 @@
             // Create a new bold element with the first part and a break element
             var firstPart = document.createElement('b');
             firstPart.textContent = firstPartText;
-            var br = document.createElement('br');
 
             // Create a new hyperlink element with the Vimeo URL
             var link = document.createElement('a');
             link.href = urlText;
+            if (!newLine) {
+                urlText = ' ' + urlText;
+            }
             link.textContent = urlText;
 
             // Remove the original text content
@@ -41,7 +43,10 @@
 
             // Append the new text and elements to the element
             element.appendChild(firstPart);
-            element.appendChild(br);
+            if (newLine) {
+                var br = document.createElement('br');
+                element.appendChild(br);
+            }
             element.appendChild(link);
         }
     }
@@ -73,6 +78,7 @@
             purpleButton.style.borderRadius = '4px'; // Round the corners
             purpleButton.classList.add('purple-button-link'); // Add a class for easy identification
             purpleButton.style.height = '24px'; // Set the height to make it shorter
+            purpleButton.style.width = '84px';
 
             // Insert the button after the order number
             orderNumberElement.parentNode.insertBefore(purpleButton, orderNumberElement.nextSibling);
@@ -91,15 +97,25 @@
             }
         });
 
+        // Find all labels with the "Your Video:" text and get their parent nodes
+        var videoElements1 = Array.from(document.querySelectorAll('label')).filter(el => el.textContent.toLowerCase().includes('your video:')).map(el => el.parentNode);
+
+        // Modify each element if not already modified
+        videoElements1.forEach(element => {
+            if (!element.querySelector('a')) {
+                modifyVideo(element, false);
+            }
+        });
+
         // Find the order number element// Use a CSS attribute selector to find elements with partial class names
-        var orderElements = document.querySelectorAll('[class*="order-number-and-status"]');
+        var orderElements = document.querySelectorAll('[class*="order-details-order-info-section"]');
 
         // Check if there are any matching elements
         if (orderElements.length > 0) {
             // Get the first element
-            var orderElement = orderElements[0].querySelectorAll('[class*="order-number"]')[0];
+            var orderElement = orderElements[0].querySelectorAll('[class*="order-info-order-number"]')[0];
             if (orderElement){
-                var orderNumber = orderNumber = orderElement.textContent.match(/\d+$/)[0];;
+                var orderNumber = orderElement.textContent.match(/\d+$/)[0];
                 if (orderNumber != previous_order) {
                     console.log("Order Changed to #" + orderNumber);
                     modifyOrderNumber(orderElement);
@@ -107,7 +123,6 @@
                 }
             }
         }
-
     }
 
     // Run the modifyAllElements function every second
