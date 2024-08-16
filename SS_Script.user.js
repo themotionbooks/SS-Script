@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SS_Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.8
+// @version      1.1.9
 // @description  Adds a break and hyperlink to the SS video description
 // @match        https://ship15.shipstation.com/*
 // @grant        none
@@ -18,36 +18,42 @@
         var text = element.textContent;
 
         if (text.includes("http") || text.includes("www")) {
-
-
             // Find the index of the first colon and split the text
             var colonIndex = text.indexOf(':');
             var firstPartText = text.slice(0, colonIndex + 1);
             var urlText = text.slice(colonIndex + 1).trim();
-            console.log(urlText);
 
-            // Create a new bold element with the first part and a break element
+            // Split the URLs by " | "
+            var urls = urlText.split(" | ");
+
+            // Create a new bold element with the first part
             var firstPart = document.createElement('b');
             firstPart.textContent = firstPartText;
-
-            // Create a new hyperlink element with the Vimeo URL
-            var link = document.createElement('a');
-            link.href = urlText;
-            if (!newLine) {
-                urlText = ' ' + urlText;
-            }
-            link.textContent = urlText;
 
             // Remove the original text content
             element.textContent = '';
 
-            // Append the new text and elements to the element
+            // Append the first part to the element
             element.appendChild(firstPart);
-            if (newLine) {
-                var br = document.createElement('br');
-                element.appendChild(br);
-            }
-            element.appendChild(link);
+
+            // Iterate over each URL and create a link
+            urls.forEach(function(url, index) {
+                // Create a new hyperlink element
+                var link = document.createElement('a');
+                link.href = url.trim();
+                link.textContent = url.trim();
+
+                // Append the link to the element
+                element.appendChild(link);
+
+                // Add a line break or space after each link if it's not the last one
+                if (newLine) {
+                    var br = document.createElement('br');
+                    element.appendChild(br);
+                } else if (index < urls.length - 1) {
+                    element.appendChild(document.createTextNode(' | '));
+                }
+            });
         }
     }
 
@@ -77,11 +83,13 @@
             purpleButton.style.alignItems = 'center'; // Center vertically
             purpleButton.style.borderRadius = '4px'; // Round the corners
             purpleButton.classList.add('purple-button-link'); // Add a class for easy identification
-            purpleButton.style.height = '24px'; // Set the height to make it shorter
             purpleButton.style.width = '84px';
+            purpleButton.style.gridArea = 'open-woo';
 
             // Insert the button after the order number
             orderNumberElement.parentNode.insertBefore(purpleButton, orderNumberElement.nextSibling);
+            orderNumberElement.parentNode.style.gridTemplateAreas = '"store-logo store-name order-number open-woo"';
+            orderNumberElement.parentNode.style.gridTemplateColumns = '40px auto auto 1fr';
         }
     }
 
