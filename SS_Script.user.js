@@ -42,6 +42,8 @@
                 var link = document.createElement('a');
                 link.href = url.trim();
                 link.textContent = url.trim();
+                link.target = "_blank"; // opens in new tab
+                link.rel = "noopener noreferrer"; // security best practice
 
                 // Append the link to the element
                 element.appendChild(link);
