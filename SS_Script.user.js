@@ -101,7 +101,7 @@
         var videoElements = Array.from(document.querySelectorAll('[class^="description-"] > b'))
         .filter(el => {
             const text = el.textContent.toLowerCase();
-            return text.includes('your video:') || text.includes('added video:');
+            return text.includes('your video:') || text.includes('added video:') ||  text.includes('your link:');
         })
         .map(el => el.parentNode);
 
