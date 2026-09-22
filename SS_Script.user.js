@@ -115,7 +115,7 @@
         // Find all labels with the "Your Video:" text and get their parent nodes
         var videoElements1 = Array.from(document.querySelectorAll('label')).filter(el => {
             const text = el.textContent.toLowerCase();
-            return text.includes('your video:') || text.includes('added video:');
+            return text.includes('your video:') || text.includes('added video:') ||  text.includes('your link:');
         }).map(el => el.parentNode);
 
         // Modify each element if not already modified
